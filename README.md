@@ -26,3 +26,20 @@ Add also to your array the painting thumbnails present in the result page file (
 Test against 2 other similar result pages to make sure it works against different layouts. (Pages that contain the same kind of carrousel. Don't necessarily have to be paintings.)
 
 The suggested time for this challenge is 4 hours. But, you can take your time and work more on it if you want.
+
+## Solution
+
+Created a GoogleSearchParser service and added specs to validate the expected behavior. Built with Ruby 3.3.5, Nokogiri for HTML parsing and RSpec for testing.
+Included three additional test pages (pablo_picasso, claude_monet, and leonardo_da_vinci) to ensure the parser works across different layouts.
+
+# Setup
+
+```
+bundle install
+```
+
+# Run tests
+
+```
+bundle exec rspec
+```
