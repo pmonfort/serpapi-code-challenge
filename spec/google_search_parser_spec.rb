@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require_relative '../lib/google_search_parser'
 
-RSpec.shared_examples 'a google search result page' do
+RSpec.shared_examples 'a valid google search result page with carousel' do
   it 'returns a JSON string' do
     expect(json_result).to be_a(String)
     expect { JSON.parse(json_result) }.not_to raise_error
@@ -47,28 +49,62 @@ RSpec.describe GoogleSearchParser do
       let(:expected_json) { File.read('files/expected-array.json') }
       let(:html_content) { File.read('files/van-gogh-paintings.html') }
 
-      it_behaves_like 'a google search result page'
+      it_behaves_like 'a valid google search result page with carousel'
     end
 
     context 'when parsing Pablo Picasso images HTML' do
       let(:expected_json) { File.read('files/pablo_picasso/expected_result.json') }
       let(:html_content) { File.read('files/pablo_picasso/search_result.html') }
 
-      it_behaves_like 'a google search result page'
+      it_behaves_like 'a valid google search result page with carousel'
     end
 
     context 'when parsing Leonardo da Vinci images HTML' do
       let(:expected_json) { File.read('files/leonardo_da_vinci/expected_result.json') }
       let(:html_content) { File.read('files/leonardo_da_vinci/search_result.html') }
 
-      it_behaves_like 'a google search result page'
+      it_behaves_like 'a valid google search result page with carousel'
     end
 
     context 'when parsing Claude Monet images HTML' do
       let(:expected_json) { File.read('files/claude_monet/expected_result.json') }
       let(:html_content) { File.read('files/claude_monet/search_result.html') }
 
-      it_behaves_like 'a google search result page'
+      it_behaves_like 'a valid google search result page with carousel'
+    end
+
+    context 'when HTML has malformed structure but with valid data' do
+      let(:expected_json) do
+        {
+          artworks: [
+            {
+              name: 'Sunflowers',
+              link: 'https://www.google.com/search?sca_esv=c2e426814f4d07e9&gl=us&hl=en&q=' \
+                    'Sunflowers&stick=H4sIAAAAAAAAAONgFuLQz9U3MI_PNVLiArFMUszTjcu1lLKTrfTL' \
+                    'MotLE3PiE4tKkJiZxSVW5flF2cWLWLmCS_PScvLLU4uKARitY11JAAAA&sa=X&ved=2ah' \
+                    'UKEwjK-K-JwLWKAxXcQTABHePpOFoQtq8DegQIMxAX',
+              image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1s9TeQSMp52s4' \
+                     'RilDMm5lMGHK26HjE3T6D-88O1l6Xf3pDCvv'
+            },
+            {
+              name: 'Wheat Field with Cypresses',
+              link: 'https://www.google.com/search?sca_esv=c2e426814f4d07e9&gl=us&hl=en&q=' \
+                    'Wheat+Field+with+Cypresses&stick=H4sIAAAAAAAAAONgFuLQz9U3MI_PNVLiArFM' \
+                    'SnJMTeK1lLKTrfTLMotLE3PiE4tKkJiZxSVW5flF2cWLWKXCM1ITSxTcMlNzUhTKM0syF' \
+                    'JwrC4pSi4tTiwEkoHZyWQAAAA&sa=X&ved=2ahUKEwjK-K-JwLWKAxXcQTABHePpOFoQt' \
+                    'q8DegQIMxAv',
+              image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-YYo-yqMf-K5i' \
+                     '2GTIoT8OmNzoTdfxd55p4TbIcmtxLbyYvKzO',
+              extensions: [
+                '1889'
+              ]
+            }
+          ]
+        }.to_json
+      end
+      let(:html_content) { File.read('files/malformed_with_valid_data.html') }
+
+      it_behaves_like 'a valid google search result page with carousel'
     end
 
     context 'when HTML has no images section' do
@@ -82,7 +118,7 @@ RSpec.describe GoogleSearchParser do
       end
     end
 
-    context 'when HTML has malformed structure' do
+    context 'when HTML has malformed structure without valid data' do
       let(:malformed_html_file) { 'files/malformed.html' }
       let(:malformed_html_content) { File.read(malformed_html_file) }
       let(:malformed_parser) { described_class.new(malformed_html_content) }
@@ -93,4 +129,4 @@ RSpec.describe GoogleSearchParser do
       end
     end
   end
-end 
+end
